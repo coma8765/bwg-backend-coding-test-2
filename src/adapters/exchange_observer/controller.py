@@ -1,3 +1,8 @@
+"""Controller for exchange rate observers
+
+Abstract:
+    Change current observer if they don't respond
+"""
 import asyncio
 import time
 from abc import ABC

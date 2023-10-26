@@ -1,3 +1,4 @@
+"""Application endpoints"""
 from fastapi import APIRouter
 
 from src.modules.api.routes import v1

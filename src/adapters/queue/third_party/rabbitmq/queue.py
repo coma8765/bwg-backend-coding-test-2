@@ -5,22 +5,21 @@ from asyncio import sleep
 from functools import lru_cache
 from logging import Logger
 from random import randint
-from typing import TypeVar, Any
+from typing import Any, TypeVar
 
-from aio_pika import connect, Message
+from aio_pika import Message, connect
 from aio_pika.abc import (
-    AbstractConnection,
     AbstractChannel,
+    AbstractConnection,
     AbstractExchange,
-    ExchangeType,
     AbstractIncomingMessage,
     DeliveryMode,
+    ExchangeType,
 )
 
 from src.adapters.queue.abc import EventBus
 from src.adapters.queue.models import Event
-from src.core import get_logger, configure_logging
-
+from src.core import configure_logging, get_logger
 
 RABBITMQ_RECONNECTION_MIN_DELAY = 1
 RABBITMQ_RECONNECTION_MAX_DELAY = 15
@@ -34,10 +33,10 @@ async def _get_rabbit_mq(connection_uri: str) -> AbstractConnection:
     delay: float = RABBITMQ_RECONNECTION_MIN_DELAY
     while True:  # Exponential backoff
         try:
-            connection = await connect(connection_uri)
+            connection = await connect(connection_uri, timeout=5)
             await connection.__aenter__()  # pylint: disable=C2801
             return connection
-        except (ConnectionError, KeyError):
+        except (TimeoutError, OSError):
             logger.warning("fail create connection, sleep %ss", delay)
             await sleep(delay)
 
@@ -57,12 +56,13 @@ class RabbitMQEventBus(EventBus):
     _connection_uri: str
     _connection: AbstractConnection
     _channel_instance: AbstractChannel
-    _exchange: AbstractExchange
+    _exchange: AbstractExchange | None
 
     def __init__(self, channel: str, connection_uri: str):
         self._logger = get_logger("third-party.rabbitmq")
         print(channel)
         super().__init__(channel)
+        self._exchange = None
         self._connection_uri = connection_uri
 
     async def startup(self, observe: bool = False):
@@ -92,21 +92,34 @@ class RabbitMQEventBus(EventBus):
             self._channel,
             data,
         )
+
+        if self._exchange is None:
+            self._logger.warning(
+                "miss event (%s), exchanger doesn't exists",
+                event.id,
+            )
+            return
+
         await self._exchange.publish(message, routing_key="")
 
     async def _observe_messages(self):
         queue = await self._channel_instance.declare_queue(exclusive=True)
 
-        await queue.bind(self._exchange)
-        self._logger.info("start listen events channel '%s'", self._channel)
+        if self._exchange is None:
+            await self.startup()
+        else:
+            await queue.bind(self._exchange)
+            self._logger.info(
+                "start listen events channel '%s'", self._channel
+            )
 
-        async with queue.iterator() as iter_:
-            message: AbstractIncomingMessage
-            async for message in iter_:
-                async with message.process():
-                    data = json.loads(message.body)
-                    self._logger.debug('got new message "%s"', data)
-                    await self.emit(Event(**data))
+            async with queue.iterator() as iter_:
+                message: AbstractIncomingMessage
+                async for message in iter_:
+                    async with message.process():
+                        data = json.loads(message.body)
+                        self._logger.debug('got new message "%s"', data)
+                        await self.emit(Event(**data))
 
 
 @lru_cache()

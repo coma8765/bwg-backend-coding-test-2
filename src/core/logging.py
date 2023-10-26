@@ -4,7 +4,7 @@ Typical usage example:
 
     _logger: Logger = get_logger("module-name")
 """
-from logging import Logger, getLogger, basicConfig
+from logging import Logger, basicConfig, getLogger
 from typing import Literal
 
 _app_logger = getLogger("app")

@@ -1,3 +1,4 @@
+"""Mappings for HTTP request adapter"""
 from http import HTTPMethod
 
 from src.adapters.http.abc import HTTPRequest

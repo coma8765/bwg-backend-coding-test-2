@@ -1,3 +1,4 @@
+"""Prometheus metrics utils"""
 from functools import lru_cache
 
 from fastapi import FastAPI

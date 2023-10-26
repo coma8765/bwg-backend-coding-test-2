@@ -6,14 +6,12 @@ from aiohttp import ClientConnectorError
 from binance import AsyncClient, BinanceSocketManager
 from binance.streams import ReconnectingWebsocket
 
-from src.adapters.exchange_observer.abc import (
-    ExchangeObserver,
-)
+from src.adapters.exchange_observer.abc import ExchangeObserver
 from src.adapters.exchange_observer.models import ExchangeRate
 from src.adapters.exchange_observer.third_party.binance.config import (
     BinanceConfig,
 )
-from src.core import get_logger, configure_logging
+from src.core import configure_logging, get_logger
 
 
 class BinanceObserver(ExchangeObserver):

@@ -1,10 +1,11 @@
+"""FastAPI depends for exchange rate"""
 from fastapi import Depends
 
 from src.adapters.queue.abc import EventBus
 from src.adapters.queue.third_party.rabbitmq.queue import get_rabbitmq
-from src.core import get_api_config, APIConfig
+from src.core import APIConfig, get_api_config
+from src.modules.api.exchange_rate_store import ExchangeRateStore
 from src.modules.api.exchange_rate_store import (
-    ExchangeRateStore,
     get_exchange_rate_store as _get_exchange_rate_store,
 )
 

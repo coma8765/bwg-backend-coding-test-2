@@ -1,14 +1,14 @@
+"""Application for serving exchange rate data
+
+
+"""
 import asyncio
 
 from fastapi import FastAPI
 
-from src.adapters.queue.third_party.rabbitmq.queue import (
-    get_rabbitmq,
-)
-from src.core import configure_logging, add_fastapi_prometheus, get_api_config
-from src.modules.api.exchange_rate_store import (
-    get_exchange_rate_store,
-)
+from src.adapters.queue.third_party.rabbitmq.queue import get_rabbitmq
+from src.core import add_fastapi_prometheus, configure_logging, get_api_config
+from src.modules.api.exchange_rate_store import get_exchange_rate_store
 from src.modules.api.routes import router
 
 config = get_api_config()

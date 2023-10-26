@@ -1,3 +1,4 @@
+"""Abstract classes for adapter of exchange observer"""
 from abc import ABC, abstractmethod
 
 from src.adapters.exchange_observer.models import ExchangeRate

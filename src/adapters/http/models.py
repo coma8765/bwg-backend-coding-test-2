@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass, field
-from http import HTTPStatus, HTTPMethod
+from http import HTTPMethod, HTTPStatus
 from typing import Union
 from uuid import UUID, uuid4
 

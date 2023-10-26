@@ -1,3 +1,4 @@
+"""Models for exchange rates"""
 from dataclasses import dataclass
 
 

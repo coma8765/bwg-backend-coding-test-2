@@ -7,26 +7,39 @@ from logging import Logger
 from binance import AsyncClient, BinanceSocketManager
 from binance.streams import ReconnectingWebsocket
 
-from src.adapters.exchange_observer.abc import (
-    ExchangeObserver,
-)
+from src.adapters.exchange_observer.abc import ExchangeObserver
 from src.adapters.exchange_observer.models import ExchangeRate
 from src.adapters.exchange_observer.third_party.coingecko.config import (
     CoingeckoConfig,
 )
 from src.adapters.http import make_request
 from src.adapters.http.abc import RequestFail
-from src.core import get_logger, configure_logging
+from src.core import configure_logging, get_logger
 
 _COINS_ENDPOINT_FORMATTED = (
     "https://api.coingecko.com/api/v3/simple/price?ids={}&vs_currencies={}"
 )
+
+_CURRENCIES_SYMBOL_MAPPING = {
+    "USD": "usd",
+    "USDT": "tether",
+    "BTC": "btc",
+    "ETC": "eth",
+    "RUB": "rub",
+}
 
 
 def _make_get_coin_to_quotes_url(
     target_currency: str,
     quote_currencies: str,
 ):
+    # target_currency =
+    # quote_currencies =
+
+    if None in (target_currency, quote_currencies):
+        # TODO: @coma8765 raise exception type not supported
+        pass
+
     return _COINS_ENDPOINT_FORMATTED.format(target_currency, quote_currencies)
 
 
@@ -57,6 +70,17 @@ class CoingeckoObserver(ExchangeObserver):
         currencies: tuple[str, str],
     ):
         loop = asyncio.get_running_loop()
+
+        currencies_symbols: tuple[str | None, str | None] = (
+            _CURRENCIES_SYMBOL_MAPPING.get(currencies[0], None),
+            _CURRENCIES_SYMBOL_MAPPING.get(currencies[1], None),
+        )
+
+        if None is currencies_symbols:
+            # TODO: @coma8765 raise exception type not supported
+            return
+        else:
+            currencies = currencies_symbols  # type: ignore
 
         self._logger.info(
             "start observe target currencies '%s'",
@@ -100,7 +124,7 @@ class CoingeckoObserver(ExchangeObserver):
                 currencies=currencies,
                 value=float(
                     # TODO: add TypedDict for fix mypy error
-                    response.json[currencies[0]][currencies[1]]  # type: ignore
+                    response.json[currencies_symbols[0]][currencies_symbols[1]]  # type: ignore
                 ),
             )
 

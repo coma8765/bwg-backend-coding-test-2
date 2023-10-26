@@ -1,3 +1,4 @@
+"""API Routes for first version of API"""
 from fastapi import APIRouter
 
 from src.modules.api.routes.v1 import courses

@@ -1,7 +1,8 @@
+"""Models for HTTP request adapter"""
 import time
 from dataclasses import dataclass, field
-from typing import TypeVar, Generic
-from uuid import uuid4, UUID
+from typing import Generic, TypeVar
+from uuid import UUID, uuid4
 
 T = TypeVar("T")
 

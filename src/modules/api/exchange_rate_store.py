@@ -1,7 +1,10 @@
+"""Exchange rate store
+
+Store, update, and return data from exchange monitor using.
+"""
 from dataclasses import dataclass
 from functools import lru_cache
 from logging import Logger
-from typing import Any
 
 from prometheus_client import Counter
 
@@ -11,32 +14,14 @@ from src.adapters.queue.models import Event
 from src.core import get_logger
 
 
-@dataclass
-class ExchangeRateShort:
-    direction: str
-    value: float
-
-
 class DataNotExist(Exception):
     pass
 
 
 @dataclass
 class ExchangeRates:
-    """
-    {
-      "exchanger": "binance",
-      "courses": [
-        {
-          "direction": "BTC-USD",
-          "value": 54000.000123
-        }
-      ]
-    }
-    """
-
     exchanger: str
-    courses: list[ExchangeRateShort]
+    courses: list[ExchangeRate]
 
 
 class ExchangeRateStore:
@@ -102,10 +87,11 @@ class ExchangeRateStore:
 
         return ExchangeRates(
             self._latest_exchanger,
-            [
-                ExchangeRateShort(exchange.direction, exchange.value)
-                for exchange in latest_data.values()
-            ],
+            list(latest_data.values()),
+            # [
+            # ExchangeRate(exchange.direction, exchange.value)
+            # for exchange in
+            # ],
         )
 
 

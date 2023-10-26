@@ -1,15 +1,17 @@
-import asyncio
-import datetime
-from asyncio import sleep
+"""Exchange rate monitor
 
-from src.adapters.exchange_observer.abc import (
-    ExchangeObserver,
-)
+Algorithm:
+    * get data from binance, coingecko, etc...
+    * send their to defined channel using event bus
+"""
+import asyncio
+
+from src.adapters.exchange_observer.abc import ExchangeObserver
 from src.adapters.exchange_observer.controller import ExchangeUpdateController
 from src.adapters.exchange_observer.models import ExchangeRate
 from src.adapters.exchange_observer.third_party.binance import (
-    BinanceObserver,
     BinanceConfig,
+    BinanceObserver,
 )
 from src.adapters.exchange_observer.third_party.coingecko.config import (
     CoingeckoConfig,
@@ -36,16 +38,6 @@ class ExchangeUpdateMonitor(ExchangeUpdateController):
         await self._event_bus.create_event(exchange_rate)
 
 
-async def main():
-    while True:
-        data = {"time": datetime.datetime.now()}
-
-        await rabbit_.create_event(data)
-
-        print(f"[x] Sent {data}")
-        await sleep(0.5)
-
-
 def main():
     config = get_exchange_monitor_config()
     configure_logging(config.log_level)
@@ -53,7 +45,12 @@ def main():
     observers: list[ExchangeObserver] = [
         CoingeckoObserver(
             config=CoingeckoConfig(
-                target_currencies=[("usd", "btc"), ("usd", "eth")],
+                target_currencies=[
+                    ("USD", "BTC"),
+                    ("USD", "ETH"),
+                    ("USD", "RUB"),
+                    ("USDT", "USD"),
+                ],
             )
         ),
     ]

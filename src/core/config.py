@@ -52,8 +52,14 @@ def get_exchange_monitor_config() -> ExchangeMonitorConfig:
     env.read_env()
 
     return ExchangeMonitorConfig(
-        log_level=env.log_level("LOG_LEVEL", ExchangeMonitorConfig.log_level),
-        rabbitmq_uri=env.str("RABBITMQ_URI", ExchangeMonitorConfig.rabbitmq_uri),
+        log_level=env.log_level(
+            "LOG_LEVEL",
+            ExchangeMonitorConfig.log_level,
+        ),
+        rabbitmq_uri=env.str(
+            "RABBITMQ_URI",
+            ExchangeMonitorConfig.rabbitmq_uri,
+        ),
         rabbitmq_exchange_rate_channel=env.str(
             "RABBITMQ_EXCHANGE_RATE_CHANNEL",
             ExchangeMonitorConfig.rabbitmq_exchange_rate_channel,

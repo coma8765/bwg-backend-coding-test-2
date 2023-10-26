@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Coroutine, Never, Any
+from typing import Any, Callable, Coroutine, Never
 
 from src.adapters.queue.models import Event
 
