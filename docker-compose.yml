@@ -1,0 +1,90 @@
+version: '3.4'
+
+services:
+  proxy:
+    image: nginx:1.25
+    restart: on-failure
+    depends_on:
+      - api
+    networks:
+      api-network:
+        ipv4_address: 10.5.0.100
+    ports:
+      - '8080:8080'
+    volumes:
+      - './templates/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '30M'
+        reservations:
+          cpus: '0.3'
+          memory: '15M'
+  api:
+    image: bwg-backend-coding-second-api
+    restart: on-failure
+    build:
+      dockerfile: templates/Dockerfile
+      context: .
+      target: api
+    env_file:
+      - .env.docker
+    networks:
+      - api-network
+      - rabbitmq_go_net
+    depends_on:
+      - rabbitmq
+    deploy:
+      mode: replicated
+      replicas: 4
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '50M'
+        reservations:
+          cpus: '0.3'
+          memory: '30M'
+  exchange-rate:
+    image: bwg-backend-coding-second-exchange-rate
+    build:
+      dockerfile: templates/Dockerfile
+      context: .
+      target: exchange-rate
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    env_file:
+      - .env.docker
+    deploy:
+      resources:
+        limits:
+          cpus: '0.05'
+          memory: '70M'
+        reservations:
+          cpus: '0.3'
+          memory: '40M'
+    networks:
+      - rabbitmq_go_net
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    restart: on-failure
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - rabbitmq_go_net
+
+
+networks:
+  api-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+  rabbitmq_go_net:
+    driver: bridge
+

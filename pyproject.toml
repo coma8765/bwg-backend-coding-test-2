@@ -1,0 +1,21 @@
+[tool.pylint]
+disable = [
+    'C0114',
+    'C0115',
+    'C0116',
+    'R0903',
+]
+
+[tool.black]
+line-length = 79
+
+[tool.isort]
+profile = "black"
+line_length = 79
+
+[tool.mypy]
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = "binance.*"
+ignore_missing_imports = true
