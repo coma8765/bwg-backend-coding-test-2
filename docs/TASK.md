@@ -19,7 +19,7 @@ _Разделим сервис на две части_:
 - получение новых курсов через MQ
 - ETag
 
-[//]: # (TODO: @coma8765 continue here)
+[//]: # (TODO: @coma8765 continue)
 
 ## Requirements
 
@@ -35,6 +35,8 @@ _Разделим сервис на две части_:
 - isort - import sorting
 
 #### Architecture
+
+[//]: # (TODO: @coma8765 continue)
 
 ### Optimizations (optional)
 
